@@ -1,0 +1,9 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <li><a href="{% url "course:subject" %}">Best course in the world! 1</a></li>
+    <li><a href="{% url "course:subject" %}">Best course in the world! 2</a></li>
+    <li><a href="{% url "course:subject" %}">Best course in the world! 3</a></li>
+{% endblock  %}

@@ -1,0 +1,16 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+<div>
+    <p>{{ description }}</p>
+    <p>
+        <form class="d-flex" role="search" action="" method="get">
+            <textarea name="code">
+                {{ code }}
+            </textarea>
+            <button class="btn btn-outline-success text-white" type="submit">Send</button>
+        </form>
+    </p>
+</div>
+{% endblock  %}
