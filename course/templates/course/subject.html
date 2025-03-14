@@ -1,0 +1,11 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+    {% for task in tasks %}
+        <div>
+            <p><a href="{% url "course:task" %}">{{ task.name }}</a></p>
+            <p>{{ task.status }}</p>
+        </div>
+    {% endfor %}
+{% endblock  %}
