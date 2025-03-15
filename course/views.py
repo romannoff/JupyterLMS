@@ -17,15 +17,24 @@ def subject(request):
 
 
 def task(request):
-    code = request.GET.get('code', "Your code")
 
-    check_code(code)
+    is_code = False
 
     context = {
         'title': 'Лучшее задание в мире!!!!!!!!!!!',
         'description': 'Best description in the world!!!!!!',
-        'code': code,
     }
-    
+    if request.method == 'POST':
+        code = request.POST['code']
+        is_code = True
+        check_code(code)
+
+        time = '0.0'
+        memory = '10kB'
+        context['code'] = code
+        context['time'] = time
+        context['memory'] = memory
+
+    context['is_code'] = is_code
 
     return render(request, 'course/task.html', context)

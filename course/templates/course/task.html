@@ -2,15 +2,33 @@
 {% load static %}
 
 {% block content %}
-<div>
-    <p>{{ description }}</p>
-    <p>
-        <form class="d-flex" role="search" action="" method="get">
-            <textarea name="code">
-                {{ code }}
-            </textarea>
-            <button class="btn btn-outline-success text-white" type="submit">Send</button>
-        </form>
-    </p>
-</div>
+<main class="MainContent">
+    <div class="SplitContainer">
+        <div class="TaskDescription">
+            <h1 class="TaskTitle">{{ title }}</h1>
+            <div class="TaskInfo">
+                <p><strong>Описание:</strong> {{ description }}</p>
+                <p><strong>Отправленные решения:</strong> У вас ещё нет отправленных решений.</p>
+            </div>
+        </div>
+        <div class="CodeInput">
+            <form class="CodeInput" action="{% url "course:task" %}" method="POST">
+                {% csrf_token %}
+                {% if is_code %}
+                    Time: {{time}}               Memory: {{memory}}
+                {% else %}
+                     Еще не загружено ни одного решения
+                {% endif %}
+                <textarea class="CodeEditor" placeholder="Введите ваш код здесь..." name="code">{% if is_code %} {{ code }} {% endif %}</textarea>
+                <button class="SubmitButton">Отправить</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<form method="POST">
+    {% csrf_token %}
+    {{comment_form.as_p}}
+</form>
+
 {% endblock  %}
