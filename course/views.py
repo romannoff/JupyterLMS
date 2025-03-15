@@ -1,5 +1,5 @@
-import re
 from django.shortcuts import render
+from course.files.check_code import check_code
 
 # Create your views here.
 
@@ -15,10 +15,11 @@ def subject(request):
     }
     return render(request, 'course/subject.html', context)
 
-def task(request):
 
-    
-    code = request.GET.get('code',"Your code")
+def task(request):
+    code = request.GET.get('code', "Your code")
+
+    check_code(code)
 
     context = {
         'title': 'Лучшее задание в мире!!!!!!!!!!!',
