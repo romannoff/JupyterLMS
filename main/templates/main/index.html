@@ -1,9 +1,24 @@
 {% extends "main/base.html" %}
 {% load static %}
 
-
 {% block content %}
-    <li><a href="{% url "course:subject" %}">Best course in the world! 1</a></li>
-    <li><a href="{% url "course:subject" %}">Best course in the world! 2</a></li>
-    <li><a href="{% url "course:subject" %}">Best course in the world! 3</a></li>
+    <main class="MainContent">
+        <div class="TaskList">
+            <h1 class="TaskList-Title">Контест</h1>
+            <h3 class="TaskList-SectionTitle">Курсы</h3>
+            <div class="TaskList-Progress">
+                <p><strong>Прогресс:</strong> 0 из n курсов</p>
+            </div>
+            <ul class="TaskList-Items">
+                {% for course in courses %}
+                    <li class="TaskItem">
+                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "course:subject" %}">{{ course.name }}</a></span></nav>
+                        <span class="TaskItem-Status">{{ course.status }}</span>
+                        <span class="TaskItem-Attempts">☑ ø1</span>
+                    </li>                
+                {% endfor %}
+            </ul>
+            <p class="TaskList-Instruction">Выберите задачу для решения</p>
+        </div>
+    </main>
 {% endblock  %}

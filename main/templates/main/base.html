@@ -1,17 +1,32 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static "styles.css" %}">
 </head>
-<body>
-    <p>Some text</p>
-    <p>{{ content }}</p>
-    <li><a href="{% url "main:example" %}">example page</a></li>
-    <li><a href="{% url "main:index" %}">home page</a></li>
+<body class="Theme Theme_color_hrDark">
+    <header class="Header">
+        <div class="Header-Logo">
+            <img src="{% static "logo.svg" %}" alt="Логотип">
+        </div>
+        <nav class="Header-Nav">
+            <ul>
+                <li><a href="{% url "main:index" %}">Главная</a></li>
+                <li><a href="{% url "main:example" %}">О нас</a></li>
+            </ul>
+        </nav>
+        <div class="Header-UserMenu">
+            <button class="UserMenu-Button">Профиль</button>
+        </div>
+    </header>
+    
     {% block content %}
     
     {% endblock %}
+
 </body>
 </html>
