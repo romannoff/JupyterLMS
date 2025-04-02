@@ -1,1 +1,6 @@
-numpy
+django
+jupyter_client
+nbclient
+nbformat
+pydantic
+pyyaml

@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from course.files.check_code import check_code
+from course.src.check_code import check_code
 
-# Create your views here.
+# Создаем подключение к Redis
+# client = redis.StrictRedis(host='localhost', port=6379, db=0)
+
 
 def subject(request):
     
@@ -17,24 +19,19 @@ def subject(request):
 
 
 def task(request):
-
-    is_code = False
-
     context = {
         'title': 'Лучшее задание в мире!!!!!!!!!!!',
-        'description': 'Best description in the world!!!!!!',
+        'description': '''
+        def my_fun(a, b):\n
+            return a + b'''
     }
     if request.method == 'POST':
         code = request.POST['code']
-        is_code = True
-        check_code(code)
+        result = check_code(code)
+        print(result)
 
-        time = '0.0'
-        memory = '10kB'
-        context['code'] = code
-        context['time'] = time
-        context['memory'] = memory
-
-    context['is_code'] = is_code
+        context['code'] = result['text']
+        context['time'] = result['time']
+        context['memory'] = result['memory']
 
     return render(request, 'course/task.html', context)
