@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from course.src.check_code import check_code
-
+from src.check_code import check_code
 # Создаем подключение к Redis
 # client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -27,6 +26,7 @@ def task(request):
     }
     if request.method == 'POST':
         code = request.POST['code']
+        print(code)
         result = check_code(code)
         print(result)
 
