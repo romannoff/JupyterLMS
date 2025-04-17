@@ -3,9 +3,12 @@ import nbformat
 from nbclient import NotebookClient
 from nbclient.exceptions import CellExecutionError, DeadKernelError, CellTimeoutError
 from datetime import datetime
-from course.src.config import Config
+from src.config import Config
+# from config import Config
 from nbformat.notebooknode import NotebookNode
+from jupyterhub.services.auth import HubAuth
 import re
+
 
 settings = Config.from_yaml("config.yaml")
 
@@ -125,14 +128,31 @@ def check_notebook(notebook: NotebookNode) -> dict:
 
     timeout, memory_max = get_restrictions(notebook)
 
+    # Настройка аутентификации JupyterHub
+    hub_auth = HubAuth(
+        api_token='6d3d5a50a9d54e6ba2ee44ece421cd5e',  # Токен пользователя
+        hub_url='http://localhost:8000',  # URL вашего JupyterHub
+        cache_max_age=60
+    )
+
     # Создаем клиент Jupyter, который будет выполнять код
     client = NotebookClient(
         notebook,
         kernel_name=settings.kernel_name,
-        km=KernelManager(kernel_name=settings.kernel_name),
-        kernel_url=settings.kernel_url,
-        timeout=int(timeout),
+        km=KernelManager(
+            kernel_name=settings.kernel_name,
+            token=hub_auth.api_token,  # Передаём токен аутентификации
+            url=f"http://localhost:8000/user/user1"  # URL для конкретного пользователя
+        ),
+        timeout=int(timeout)
     )
+    # client = NotebookClient(
+    #     notebook,
+    #     kernel_name=settings.kernel_name,
+    #     km=KernelManager(kernel_name=settings.kernel_name),
+    #     kernel_url=settings.kernel_url,
+    #     timeout=int(timeout),
+    # )
 
     # Выполнение ноутбука
     try:
@@ -191,5 +211,14 @@ def check_code(student_code: str, filename=settings.file_name) -> dict:
     'text', 'time', 'memory'. Если тесты не выполнены или вызвано исключение, то в поле
     'text' будет описана ошибка, а остальные поля будут иметь None
     """
-    new_notebook = insert_code(filename, student_code)
+    new_notebook = insert_code(filename, student_code, save_templates=True)
     return check_notebook(new_notebook)
+
+
+# if __name__ == '__main__':
+#     print(check_code(
+#         """
+#         def my_fun(a, b):
+#             return a + b
+#         """
+# ))
