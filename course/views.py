@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from src.check_code import check_code
-# Создаем подключение к Redis
-# client = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+from src.check_code import NotebookChecker
+from src.logging_config import logger
+
+nb_checker = NotebookChecker()
 
 
 def subject(request):
@@ -26,9 +28,9 @@ def task(request):
     }
     if request.method == 'POST':
         code = request.POST['code']
-        print(code)
-        result = check_code(code)
-        print(result)
+        logger.info(code)
+        result = nb_checker.check_code(code)
+        logger.info(result)
 
         context['code'] = result['text']
         context['time'] = result['time']
