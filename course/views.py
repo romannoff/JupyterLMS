@@ -1,37 +1,67 @@
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
+import datetime
+import numpy as np
+
+from course.models import Tasks, Courses
+from users.models import Solution
 from course.src.check_code import check_code
 
 # Создаем подключение к Redis
 # client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
-def subject(request):
+@login_required
+def subject(request, subject_slug):
+
+    course = Courses.objects.get(slug=subject_slug)
+    course_name = course.name
+    tasks = Tasks.objects.filter(course=course)
     
+
     context = {
-        'title': 'Список заданий лучшего курса в мире!!!',
-        'tasks': [
-            {'name': 'Best task in the world!!! 1', 'status': 'uncomplited'}, 
-            {'name': 'Best task in the world!!! 2', 'status': 'uncomplited'}, 
-            {'name': 'Best task in the world!!! 3', 'status': 'uncomplited'}
-            ],
+        'title': 'Список заданий курса',
+        'tasks': tasks,
+        'course_name': course_name,
     }
     return render(request, 'course/subject.html', context)
 
-
-def task(request):
+@login_required
+def task(request, task_slug):
+    task = Tasks.objects.get(slug=task_slug)
     context = {
-        'title': 'Лучшее задание в мире!!!!!!!!!!!',
-        'description': '''
-        def my_fun(a, b):\n
-            return a + b'''
+        'title': task,
+        'description': task.description,
     }
+    solution = Solution.objects.filter(task=task, user=request.user).order_by('-timestamp').first()
+
     if request.method == 'POST':
         code = request.POST['code']
-        result = check_code(code)
-        print(result)
+        print(code)
 
-        context['code'] = result['text']
-        context['time'] = result['time']
-        context['memory'] = result['memory']
 
+        if not (solution and code == solution.user_code) and code:
+
+            notebook = task.notebook # расположение ноутбука с тестами
+            result = check_code(code)
+            print(result)
+
+            context['text'] = result['text']
+            solution = Solution.objects.create(
+                user=request.user, 
+                task=task, 
+                user_code=code, 
+                timestamp=datetime.datetime.now(), 
+                time=result['time'], 
+                memory=result['memory'],
+                score = np.sqrt(result['time']**2 + result['memory']**2)
+                )
+
+        # items = render_to_string('course/task.html', context, request=request)
+        # return JsonResponse({'items' : items})
+    context['code'] = solution
+    best_solution = Solution.objects.filter(task=task, user=request.user).order_by('score').first()
+    context['best_solution'] = best_solution
     return render(request, 'course/task.html', context)

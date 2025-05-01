@@ -1,26 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
+from course.models import Courses
+
+@login_required
 def index(request):
 
+    courses = Courses.objects.all()
+
     context = {
-        'content': 'Some Content',
-        'title': 'Каталог лучших курсов в мире!!!!!',
-        'courses': [
-            {'name': 'Best course in the world!!!!1', 'status': 'uncomplited'},
-            {'name': 'Best course in the world!!!!2', 'status': 'uncomplited'},
-            {'name': 'Best course in the world!!!!3', 'status': 'uncomplited'},
-            ],
+        'title': 'Доступные курсы',
+        'courses': courses
     }
 
     return render(request, 'main/index.html', context)
-
-def example(request):
-    
-    context = {
-        'content': 'example page',
-        'title': 'EXAMPLE'
-    }
-
-    return render(request, 'main/index.html', context)
-

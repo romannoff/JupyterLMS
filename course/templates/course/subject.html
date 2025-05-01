@@ -5,17 +5,17 @@
     <main class="MainContent">
         <div class="TaskList">
             <h1 class="TaskList-Title">Контест</h1>
-            <h2 class="TaskList-Subtitle">Учебник по ML</h2>
+            <h2 class="TaskList-Subtitle">{{ course_name }}</h2>
             <h3 class="TaskList-SectionTitle">Задачи</h3>
-            <div class="TaskList-Progress">
+            {% comment %} <div class="TaskList-Progress">
                 <p><strong>Прогресс:</strong> 0 из n баллов</p>
-            </div>
+            </div> {% endcomment %}
             <ul class="TaskList-Items">
                 {% for task in tasks %}
                     <li class="TaskItem">
-                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "course:task" %}">{{ task.name }}</a></span></nav>
-                        <span class="TaskItem-Status">{{ task.status }}</span>
-                        <span class="TaskItem-Attempts">☑ ø1</span>
+                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "subject:task" task.slug%}">{{ task.name }}</a></span></nav>
+                        {% comment %} <span class="TaskItem-Status">{{ task.status }}</span>
+                        <span class="TaskItem-Attempts">☑ ø1</span> {% endcomment %}
                     </li>                
                 {% endfor %}
             </ul>
