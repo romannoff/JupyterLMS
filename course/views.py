@@ -39,6 +39,7 @@ def task(request, task_slug):
 
     if request.method == 'POST':
         code = request.POST['code']
+        print(code)
 
 
         if not (solution and code == solution.user_code) and code:
