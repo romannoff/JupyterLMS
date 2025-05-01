@@ -16,11 +16,14 @@
         <nav class="Header-Nav">
             <ul>
                 <li><a href="{% url "main:index" %}">Главная</a></li>
-                <li><a href="{% url "main:example" %}">О нас</a></li>
+                {% if user.is_admin or user.is_staff %}
+                    <li><a href="{% url "admin:index" %}">Админ панель</a></li>
+                {% endif %}
+                <li><a href="{% url "user:logout" %}">Выйти</a></li>
             </ul>
         </nav>
         <div class="Header-UserMenu">
-            <button class="UserMenu-Button">Профиль</button>
+            {% comment %} <button class="UserMenu-Button">Профиль</button> {% endcomment %}
         </div>
     </header>
     

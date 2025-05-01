@@ -1,34 +1,34 @@
 {% extends "main/base.html" %}
 {% load static %}
-
+{{form.media}}
 {% block content %}
 <main class="MainContent">
     <div class="SplitContainer">
         <div class="TaskDescription">
-            <h1 class="TaskTitle">{{ title }}</h1>
+            <h1 class="TaskTitle">{{ title.name }}</h1>
             <div class="TaskInfo">
                 <p><strong>Описание:</strong> {{ description }}</p>
-                <p><strong>Отправленные решения:</strong> У вас ещё нет отправленных решений.</p>
+                {% if best_solution %}
+                <p><strong>Лучшее решение:</strong> Time: {{code.time}} с.              Memory: {{code.memory}} {{title.memory_unit}} </p>
+                {{ best_solution }}
+                {% else %}
+                <p><strong>Еще не загружено ни одного решения</strong></p>
+                {% endif %}
             </div>
         </div>
         <div class="CodeInput">
-            <form class="CodeInput" action="{% url "course:task" %}" method="POST">
+            <form class="CodeInput" method="POST">
                 {% csrf_token %}
-                {% if is_code %}
-                    Time: {{time}}               Memory: {{memory}}
+                {% if code %}
+                    Time: {{code.time}} с.              Memory: {{code.memory}} {{title.memory_unit}}
                 {% else %}
-                     Еще не загружено ни одного решения
+                     
                 {% endif %}
-                <textarea class="CodeEditor" placeholder="Введите ваш код здесь..." name="code">{% if is_code %} {{ code }} {% endif %}</textarea>
+                <textarea class="CodeEditor" placeholder="Введите ваш код здесь..." name="code" id="textbox">{% if code %}{{ code }}{% endif %}</textarea>
                 <button class="SubmitButton">Отправить</button>
             </form>
         </div>
     </div>
 </main>
-
-<form method="POST">
-    {% csrf_token %}
-    {{comment_form.as_p}}
-</form>
 
 {% endblock  %}

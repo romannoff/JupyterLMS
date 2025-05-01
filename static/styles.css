@@ -6,6 +6,45 @@ body {
     padding: 0;
 }
 
+.AuthLayout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--hr-color-surface-0);
+}
+
+.AuthCard {
+    width: 400px;
+    padding: 32px;
+    background: var(--hr-color-surface-100);
+    border-radius: var(--hr-border-radius-m);
+    box-shadow: var(--hr-effects-shadow);
+}
+
+.AuthTitle {
+    font: var(--hr-typography-font-title-m-all-params);
+    color: var(--hr-color-text-primary);
+    margin-bottom: 24px;
+}
+
+.AuthForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.AuthLinks {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.AuthSwitchLink {
+    color: var(--hr-color-special-link);
+    cursor: pointer;
+}
+
 .Theme_color_hrDark {
     --hr-color-surface-100: #1a1d1e;
     --hr-color-text-primary: #fffdfa;

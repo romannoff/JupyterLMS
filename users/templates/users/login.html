@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static "styles.css" %}">
+</head>
+<body class="Theme Theme_color_hrDark">
+    <header class="Header">
+        <div class="Header-Logo">
+            <img src="{% static "logo.svg" %}" alt="Логотип">
+        </div>
+    </header>
+
+    <div class="AuthLayout">
+        <div class="AuthCard">
+            <h1 class="AuthTitle">Вход</h1>
+            <form class="AuthForm" action="{% url "user:login" %}" method="POST">
+                {% csrf_token %}
+                <div class="Field">
+                    <div class="InputBase">
+                        <input 
+                            value="{% if  form.username.value %}{{ form.username.value }}{% endif %}"
+                            type="login" 
+                            class="InputBase-Control HrInput-Control" 
+                            placeholder="Login"
+                            name="username"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="Field">
+                    <div class="InputBase">
+                        <input 
+                            type="password" 
+                            class="InputBase-Control HrInput-Control" 
+                            placeholder="Пароль"
+                            name="password"
+                            required
+                        >
+                    </div>
+                </div>
+                <button class="Button2 Button2_view_primary Button2_size_m" type="submit">
+                    Войти
+                </button>
+
+                <div class="AuthLinks">
+                    <a class="AuthSwitchLink" href="{% url "user:registration" %}">Создать аккаунт</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
