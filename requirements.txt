@@ -4,3 +4,5 @@ nbclient
 nbformat
 pydantic
 pyyaml
+jupyterhub
+ipykernel
