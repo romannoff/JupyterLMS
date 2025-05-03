@@ -1,0 +1,20 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="MainContent">
+        <div class="TaskList">
+            <form class="AuthForm" action="{% url "main:prep" %}" method="POST">
+                {% csrf_token %}
+                <div class="Field">
+                    <div class="InputBase">
+                        <input type="file" name="notebook" id="id_notebook" required>
+                    </div>
+                </div>
+                <button class="Button2 Button2_view_primary Button2_size_m" type="submit">
+                    Отправить
+                </button>
+            </form>
+        </div>
+    </main>
+{% endblock  %}

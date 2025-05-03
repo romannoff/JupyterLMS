@@ -7,6 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{% static "styles.css" %}">
+    <link href="{% static "js/codemirror/lib/codemirror.css"%}" rel="stylesheet">
+    <script src="{% static "js/codemirror/lib/codemirror.js" %}"></script>
+    <script src="{% static "js/codemirror/mode/python/python.js" %}"></script>
+    <link href="{% static "js/codemirror/theme/darcula.css"%}" rel="stylesheet">
+    <link href="{% static "js/codemirror/theme/dracula.css"%}" rel="stylesheet">
+    <script src="{% static "js/codemirror/addon/edit/matchbrackets.js" %}"></script>
+    <style>
+        .CodeMirror { height: auto; }
+        .CodeMirror-scroll { max-height: 200px; }
+        .CodeMirror pre { padding-left: 7px; line-height: 1.25; }
+    </style>
 </head>
 <body class="Theme Theme_color_hrDark">
     <header class="Header">
@@ -18,6 +29,9 @@
                 <li><a href="{% url "main:index" %}">Главная</a></li>
                 {% if user.is_admin or user.is_staff %}
                     <li><a href="{% url "admin:index" %}">Админ панель</a></li>
+                {% endif %}
+                {% if user.is_admin or user.is_staff %}
+                    <li><a href="{% url "main:prep" %}">Добавить курс</a></li>
                 {% endif %}
                 <li><a href="{% url "user:logout" %}">Выйти</a></li>
             </ul>

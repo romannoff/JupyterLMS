@@ -7,6 +7,9 @@
 - .\venv\Scripts\activate
 - pip install -r .\requirements.txt
 - pip install -e .\course\.
+- manage.py makemigrations
+- mange.py migrate
+- manage.py createsuperuser
 - python .\manage.py runserver
 
 # Ключевые особенности:

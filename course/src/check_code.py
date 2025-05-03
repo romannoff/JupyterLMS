@@ -3,7 +3,7 @@ import nbformat
 from nbclient import NotebookClient
 from nbclient.exceptions import CellExecutionError, DeadKernelError, CellTimeoutError
 from datetime import datetime
-from src.config import Config
+from course.src.config import Config
 # from config import Config
 from nbformat.notebooknode import NotebookNode
 from jupyterhub.services.auth import HubAuth
@@ -89,7 +89,7 @@ def get_time(notebook_output: dict) -> str:
     end = datetime.strptime(notebook_output['cells'][1]['metadata']['execution']['iopub.status.idle'], fmt)
 
     delta = end - start
-    return f'{delta.seconds}.{delta.microseconds} sec.'
+    return f'{delta.seconds}.{delta.microseconds}#sec.'
 
 
 def get_memory(notebook_output: dict, max_memory: float) -> str:
@@ -113,7 +113,7 @@ def get_memory(notebook_output: dict, max_memory: float) -> str:
     while memory > 1024:
         unit += 1
         memory /= 1024
-    return f'{memory:.2f} {settings.units[unit]}'
+    return f'{memory:.2f}#{settings.units[unit]}'
 
 
 def check_notebook(notebook: NotebookNode) -> dict:

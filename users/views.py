@@ -8,6 +8,8 @@ from users.forms import UserLoginForm, UserRegistrationForm
 
 # Create your views here.
 def login(request):
+    if request.user.is_authenticated:
+        return redirect(reverse('main:index'))
     if request.method == 'POST':
         form  = UserLoginForm(data=request.POST)
         if form.is_valid():
@@ -26,6 +28,8 @@ def login(request):
     return render(request, 'users/login.html', context)
 
 def registration(request):
+    if request.user.is_authenticated:
+        return redirect(reverse('main:index'))
     if request.method == 'POST':
         form  = UserRegistrationForm(data=request.POST)
         if form.is_valid():

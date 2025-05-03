@@ -15,3 +15,12 @@ def index(request):
     }
 
     return render(request, 'main/index.html', context)
+
+@login_required
+def prep(request):
+
+    context = {
+        'title': 'Добавить новое задание',
+    }
+
+    return render(request, 'main/add_course.html', context)

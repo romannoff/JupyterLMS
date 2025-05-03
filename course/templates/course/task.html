@@ -1,6 +1,5 @@
 {% extends "main/base.html" %}
 {% load static %}
-{{form.media}}
 {% block content %}
 <main class="MainContent">
     <div class="SplitContainer">
@@ -9,26 +8,66 @@
             <div class="TaskInfo">
                 <p><strong>Описание:</strong> {{ description }}</p>
                 {% if best_solution %}
-                <p><strong>Лучшее решение:</strong> Time: {{code.time}} с.              Memory: {{code.memory}} {{title.memory_unit}} </p>
-                {{ best_solution }}
+                <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
+                <textarea id="placer">{{best_solution}}</textarea>
                 {% else %}
                 <p><strong>Еще не загружено ни одного решения</strong></p>
                 {% endif %}
+
             </div>
         </div>
         <div class="CodeInput">
             <form class="CodeInput" method="POST">
                 {% csrf_token %}
                 {% if code %}
-                    Time: {{code.time}} с.              Memory: {{code.memory}} {{title.memory_unit}}
+                Time: {{code.time}} с.              Memory: {{code.memory}} {{title.memory_unit}}
                 {% else %}
-                     
+                
                 {% endif %}
-                <textarea class="CodeEditor" placeholder="Введите ваш код здесь..." name="code" id="textbox">{% if code %}{{ code }}{% endif %}</textarea>
+                <textarea id="placer1">def my_fun(x, y):</textarea>
+                <textarea id="editor" name="code">{% if code %}{{code}}{% else %}    {% endif %}</textarea>
+                <textarea id="placer2">return res</textarea>
                 <button class="SubmitButton">Отправить</button>
             </form>
         </div>
     </div>
 </main>
 
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: {name: "python",
+            version: 3,
+            singleLineStringErrors: false},
+
+        indentUnit: 4,
+        matchBrackets: true,
+        theme: "darcula"
+    });
+
+    var placer1 = CodeMirror.fromTextArea(document.getElementById("placer1"), {
+        mode: {name: "python",
+            version: 2,
+            singleLineStringErrors: false},
+        theme: "darcula",
+        readOnly: true,
+    });
+
+    var placer2 = CodeMirror.fromTextArea(document.getElementById("placer2"), {
+        mode: {name: "python",
+            version: 2,
+            singleLineStringErrors: false},
+        theme: "darcula",
+        readOnly: true
+    });
+
+    var placer = CodeMirror.fromTextArea(document.getElementById("placer"), {
+        mode: {name: "python",
+            version: 2,
+            singleLineStringErrors: false},
+        lineNumbers: true,
+        theme: "darcula",
+        readOnly: true
+    });
+
+</script>
 {% endblock  %}

@@ -54,9 +54,9 @@ def task(request, task_slug):
                 task=task, 
                 user_code=code, 
                 timestamp=datetime.datetime.now(), 
-                time=result['time'], 
-                memory=result['memory'],
-                score = np.sqrt(result['time']**2 + result['memory']**2)
+                time=float(result['time'].split('#')[0]), 
+                memory=float(result['memory'].split('#')[0]),
+                score = np.sqrt(float(result['time'].split('#')[0])**2 + float(result['memory'].split('#')[0])**2)
                 )
 
         # items = render_to_string('course/task.html', context, request=request)
