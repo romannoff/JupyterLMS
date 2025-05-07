@@ -7,10 +7,11 @@ import numpy as np
 
 from course.models import Tasks, Courses
 from users.models import Solution
-from course.src.check_code import check_code
 
-# Создаем подключение к Redis
-# client = redis.StrictRedis(host='localhost', port=6379, db=0)
+from src.check_code import NotebookChecker
+from src.logging_config import logger
+
+nb_checker = NotebookChecker()
 
 
 @login_required
@@ -44,13 +45,10 @@ def task(request, task_slug):
 
         if not (solution and code == solution.user_code) and code:
 
-            notebook = task.course.notebook # расположение ноутбука с тестами
-            task_id = task.id # id задания
-            user_id = request.user.id # id пользователя
-            course_id = task.course.id # id курса
-
-            result = check_code(code)
-            print(result)
+            notebook = task.notebook # расположение ноутбука с тестами
+            logger.info(code)
+            result = nb_checker.check_code(code)
+            logger.info(result)
 
             if result['time'] is None or result['memory'] is None:
                 context['text'] = result['text']

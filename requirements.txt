@@ -6,4 +6,5 @@ pydantic
 pyyaml
 jupyterhub
 ipykernel
+websocket-client
 pytils
