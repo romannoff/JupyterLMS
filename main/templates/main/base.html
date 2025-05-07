@@ -31,7 +31,21 @@
                     <li><a href="{% url "admin:index" %}">Админ панель</a></li>
                 {% endif %}
                 {% if user.is_admin or user.is_staff %}
-                    <li><a href="{% url "main:prep" %}">Добавить курс</a></li>
+                    <form class="AuthForm" action="{% url "main:prep" %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <table>
+                            <tr>
+                                <th>
+                                <input type="file" name="notebook" required>
+                                </th>
+                                <th>
+                                <button type="submit">
+                                    Отправить
+                                </button>
+                                </th>
+                            </tr>
+                        </table>
+                    </form>
                 {% endif %}
                 <li><a href="{% url "user:logout" %}">Выйти</a></li>
             </ul>

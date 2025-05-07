@@ -44,24 +44,31 @@ def task(request, task_slug):
 
         if not (solution and code == solution.user_code) and code:
 
-            notebook = task.notebook # расположение ноутбука с тестами
+            notebook = task.course.notebook # расположение ноутбука с тестами
+            task_id = task.id # id задания
+            user_id = request.user.id # id пользователя
+            course_id = task.course.id # id курса
+
             result = check_code(code)
             print(result)
 
-            context['text'] = result['text']
-            solution = Solution.objects.create(
-                user=request.user, 
-                task=task, 
-                user_code=code, 
-                timestamp=datetime.datetime.now(), 
-                time=float(result['time'].split('#')[0]), 
-                memory=float(result['memory'].split('#')[0]),
-                score = np.sqrt(float(result['time'].split('#')[0])**2 + float(result['memory'].split('#')[0])**2)
-                )
+            if result['time'] is None or result['memory'] is None:
+                context['text'] = result['text']
+                context['code'] = code
+            else:
+                solution = Solution.objects.create(
+                    user=request.user, 
+                    task=task, 
+                    user_code=code, 
+                    timestamp=datetime.datetime.now(), 
+                    time=float(result['time'].split('#')[0]), 
+                    memory=float(result['memory'].split('#')[0]),
+                    score = np.sqrt(float(result['time'].split('#')[0])**2 + float(result['memory'].split('#')[0])**2)
+                    )
+                context['code'] = solution
 
         # items = render_to_string('course/task.html', context, request=request)
         # return JsonResponse({'items' : items})
-    context['code'] = solution
     best_solution = Solution.objects.filter(task=task, user=request.user).order_by('score').first()
     context['best_solution'] = best_solution
     return render(request, 'course/task.html', context)
