@@ -19,8 +19,8 @@ class User(AbstractUser):
 class Solution(models.Model):
     user_code = models.TextField(verbose_name='Код пользователя')
     timestamp = models.DateTimeField(verbose_name='Время загрузки')
-    task = models.ForeignKey(to=Tasks, on_delete=models.PROTECT, verbose_name='Задание')
-    user = models.ForeignKey(to=User, on_delete=models.PROTECT, verbose_name='Пользователь')
+    task = models.ForeignKey(to=Tasks, on_delete=models.CASCADE, verbose_name='Задание')
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name='Пользователь')
     time = models.DecimalField(default=0.00, decimal_places=2, max_digits=7, verbose_name='Время')
     memory = models.PositiveIntegerField(default=0, verbose_name='Память')
     score = models.DecimalField(default=0.00, decimal_places=2, max_digits=7, verbose_name='Результат')

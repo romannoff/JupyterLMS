@@ -1,9 +1,12 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from pytils.translit import slugify
 
-from course.models import Courses
+from course.models import Courses, Tasks
+from src.jupyter_parser import jupyter_parser
+from main.forms import TaskCreationForm, CourseCreationForm
 
 @login_required
 def index(request):
@@ -19,68 +22,89 @@ def index(request):
 
 @login_required
 def prep(request):
-    context = {
-        'title': 'Проверка нового курса',
-    }
 
     notebook = request.FILES['notebook']
 
-    slug = slugify("привет ПОПА попная")
+    with open("course_files/"+notebook.name, "wb+") as destination:
+        for chunk in notebook.chunks():
+            destination.write(chunk)
 
-        # with open("course_files/"+notebook.name, "wb+") as destination:
-        #     for chunk in notebook.chunks():
-        #         destination.write(chunk)
+    parse_res = jupyter_parser("course_files/"+notebook.name)
+
+    course_form = CourseCreationForm(
+        data={
+            'name': parse_res['course_name'],
+        }
+    )
+
+    tasks = []
+    no = 0
+    for task in parse_res['tasks']:
+        task_form = TaskCreationForm(
+            data={
+                'name': task['task_name'],
+                'time': task['time_limit'],
+                'memory': task['memory_limit'],
+                'no': no
+            }
+        )
+        task_form.up_code = task['backbone']
+        task_form.down_code = 'return SOMETHING'
+        task_form.open_assert = task['open_tests']
+        task_form.close_assert = 'CLOSE ASSERT'
+        task_form.description = task['task_description']
+        no += 1
+        tasks.append(task_form)
 
 
-
-    course_name = 'course_name'
-    tasks_name = ['task_name', ]
-    tasks_description = ['task_description', ]
-    tasks_open_asserts = ['task_open_asserts', ]
-    tasks_time = ['task_time', ]
-    tasks_memory = ['task_memory', ]
-    tasks_memory_unit = ['task_memory_unit', ]
-    tasks_up_code = ['task_up_code', ]
-    tasks_down_code = ['task_down_code', ]
-
+    context = {
+        'title': 'Проверка нового курса',
+        'form': course_form,
+        'tasks': tasks,
+        'len_task': len(tasks),
+        'notebook': notebook,
+    }
     return render(request, 'main/add_course.html', context)
 
 
-# @login_required
-# def prep(request):
+@login_required
+def save(request):
 
-#     context = {
-#         'title': 'Добавить новое задание',
-#     }
-#     if request.method == 'POST':
-#         # form = UploadFileForm(request.POST, request.FILES)
-#         # if form.is_valid():
+    course = Courses.objects.filter(slug=slugify(request.POST['course_name']))
+    if course:
+        course.update(notebook=request.POST['notebook'])
+        course = course.first()
+    else:
+        course = Courses.objects.create(
+            name=request.POST['course_name'],
+            notebook=request.POST['notebook'],
+            slug=slugify(request.POST['course_name']),
+        )
 
-#         notebook = request.FILES['notebook']
+    for i in range(int(request.POST['len_task'])):
+        task = Courses.objects.filter(slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']))
+        if task:
+            task.update(
+                up_code=request.POST[f'task_up_code-{i}'],
+                down_code=request.POST[f'task_down_code-{i}'],
+                open_assert=request.POST[f'task_open_assert-{i}'],
+                close_assert=request.POST[f'task_close_assert-{i}'],
+                description=request.POST[f'task_description-{i}'],
+                time=float(request.POST[f'task_time-{i}'].replace(',', '.')),
+                memory=float(request.POST[f'task_memory-{i}'].replace(',', '.')),
+                )
+        else:
+            Tasks.objects.create(
+                name=request.POST[f'task_name-{i}'],
+                up_code=request.POST[f'task_up_code-{i}'],
+                down_code=request.POST[f'task_down_code-{i}'],
+                open_assert=request.POST[f'task_open_assert-{i}'],
+                close_assert=request.POST[f'task_close_assert-{i}'],
+                slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']),
+                description=request.POST[f'task_description-{i}'],
+                time=float(request.POST[f'task_time-{i}'].replace(',', '.')),
+                memory=float(request.POST[f'task_memory-{i}'].replace(',', '.')),
+                course=course,
+            )
 
-#         slug = slugify("привет ПОПА попная")
-
-#         # with open("course_files/"+notebook.name, "wb+") as destination:
-#         #     for chunk in notebook.chunks():
-#         #         destination.write(chunk)
-
-
-
-#         course_name = 'course_name'
-#         tasks_name = ['task_name', ]
-#         tasks_description = ['task_description', ]
-#         tasks_open_asserts = ['task_open_asserts', ]
-#         tasks_time = ['task_time', ]
-#         tasks_memory = ['task_memory', ]
-#         tasks_memory_unit = ['task_memory_unit', ]
-#         tasks_up_code = ['task_up_code', ]
-#         tasks_down_code = ['task_down_code', ]
-
-
-
-#         # Courses.objects.create(
-#         #     name=course_name,
-#         #     notebook=notebook
-#         # )
-
-#     return render(request, 'main/add_course.html', context)
+    return redirect(reverse('main:index'))

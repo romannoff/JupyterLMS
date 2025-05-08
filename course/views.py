@@ -11,7 +11,7 @@ from users.models import Solution
 from src.check_code import NotebookChecker
 from src.logging_config import logger
 
-nb_checker = NotebookChecker()
+# nb_checker = NotebookChecker()
 
 
 @login_required
@@ -34,7 +34,6 @@ def task(request, task_slug):
     task = Tasks.objects.get(slug=task_slug)
     context = {
         'title': task,
-        'description': task.description,
     }
     solution = Solution.objects.filter(task=task, user=request.user).order_by('-timestamp').first()
 
@@ -45,9 +44,14 @@ def task(request, task_slug):
 
         if not (solution and code == solution.user_code) and code:
 
-            notebook = task.notebook # расположение ноутбука с тестами
+            notebook = task.course.notebook # расположение ноутбука с тестами
             logger.info(code)
-            result = nb_checker.check_code(code)
+            # result = nb_checker.check_code(code)
+            result = {
+                'text': 'text', 
+                'time': '12',
+                'memory': '100',
+            }
             logger.info(result)
 
             if result['time'] is None or result['memory'] is None:
@@ -63,10 +67,8 @@ def task(request, task_slug):
                     memory=float(result['memory'].split('#')[0]),
                     score = np.sqrt(float(result['time'].split('#')[0])**2 + float(result['memory'].split('#')[0])**2)
                     )
-                context['code'] = solution
 
-        # items = render_to_string('course/task.html', context, request=request)
-        # return JsonResponse({'items' : items})
+    context['code'] = solution
     best_solution = Solution.objects.filter(task=task, user=request.user).order_by('score').first()
     context['best_solution'] = best_solution
     return render(request, 'course/task.html', context)

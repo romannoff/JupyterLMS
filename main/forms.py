@@ -9,8 +9,6 @@ class CourseCreationForm(forms.Form):
         model = Courses
 
     name = forms.CharField()
-    slug = forms.SlugField()
-    notebook = forms.FileField()
 
 class TaskCreationForm(forms.Form):
 
@@ -22,9 +20,7 @@ class TaskCreationForm(forms.Form):
     down_code = forms.Textarea()
     open_assert = forms.Textarea()
     close_assert = forms.Textarea()
-    slug = forms.SlugField()
     description = forms.Textarea()
     time = forms.DecimalField()
-    memory = forms.IntegerField()
-    memory_unit = forms.CharField()
-    course = forms.InlineForeignKeyField()
+    memory = forms.DecimalField()
+    no = forms.IntegerField()

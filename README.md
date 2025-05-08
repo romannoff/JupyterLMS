@@ -10,7 +10,7 @@
 - manage.py makemigrations
 - mange.py migrate
 - manage.py createsuperuser
-- python .\manage.py runserver
+- python .\manage.py runserver 9000 (тут можно указать любой порт)
 
 # Ключевые особенности:
 
