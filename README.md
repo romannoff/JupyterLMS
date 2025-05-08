@@ -7,7 +7,10 @@
 - .\venv\Scripts\activate
 - pip install -r .\requirements.txt
 - pip install -e .\course\.
-- python .\manage.py runserver
+- manage.py makemigrations
+- mange.py migrate
+- manage.py createsuperuser
+- python .\manage.py runserver 9000 (тут можно указать любой порт)
 
 # Ключевые особенности:
 

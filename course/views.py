@@ -1,4 +1,12 @@
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
+import datetime
+import numpy as np
+
+from course.models import Tasks, Courses
+from users.models import Solution
 
 from src.check_code import NotebookChecker
 from src.logging_config import logger
@@ -6,34 +14,60 @@ from src.logging_config import logger
 nb_checker = NotebookChecker()
 
 
-def subject(request):
+@login_required
+def subject(request, subject_slug):
+
+    course = Courses.objects.get(slug=subject_slug)
+    course_name = course.name
+    tasks = Tasks.objects.filter(course=course)
     
+
     context = {
-        'title': 'Список заданий лучшего курса в мире!!!',
-        'tasks': [
-            {'name': 'Best task in the world!!! 1', 'status': 'uncomplited'}, 
-            {'name': 'Best task in the world!!! 2', 'status': 'uncomplited'}, 
-            {'name': 'Best task in the world!!! 3', 'status': 'uncomplited'}
-            ],
+        'title': 'Список заданий курса',
+        'tasks': tasks,
+        'course_name': course_name,
     }
     return render(request, 'course/subject.html', context)
 
-
-def task(request):
+@login_required
+def task(request, task_slug):
+    task = Tasks.objects.get(slug=task_slug)
     context = {
-        'title': 'Лучшее задание в мире!!!!!!!!!!!',
-        'description': '''
-        def my_fun(a, b):\n
-            return a + b'''
+        'title': task,
     }
+    solution = Solution.objects.filter(task=task, user=request.user).order_by('-timestamp').first()
+
     if request.method == 'POST':
-        code = request.POST['code']
-        logger.info(code)
-        result = nb_checker.check_code(code)
-        logger.info(result)
+        code = request.POST['code'] # код только пользователя (без начала и конца)
+        print(code)
 
-        context['code'] = result['text']
-        context['time'] = result['time']
-        context['memory'] = result['memory']
 
+        if not (solution and code == solution.user_code) and code:
+
+            notebook = task.course.notebook # расположение ноутбука с тестами
+            user_id = request.user.id # id пользователя
+            time = task.time # ограничение по времени
+            memory = task.memory # ограничение по памяти
+            task_name = task.name # название задания
+            logger.info(code)
+            result = nb_checker.check_code(code)
+            logger.info(result)
+
+            if result['time'] is None or result['memory'] is None:
+                context['text'] = result['text']
+                context['code'] = code
+            else:
+                solution = Solution.objects.create(
+                    user=request.user, 
+                    task=task, 
+                    user_code=code, 
+                    timestamp=datetime.datetime.now(), 
+                    time=float(result['time'].split('#')[0]), 
+                    memory=float(result['memory'].split('#')[0]),
+                    score = np.sqrt(float(result['time'].split('#')[0])**2 + float(result['memory'].split('#')[0])**2)
+                    )
+
+    context['code'] = solution
+    best_solution = Solution.objects.filter(task=task, user=request.user).order_by('score').first()
+    context['best_solution'] = best_solution
     return render(request, 'course/task.html', context)

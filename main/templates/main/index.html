@@ -6,19 +6,19 @@
         <div class="TaskList">
             <h1 class="TaskList-Title">Контест</h1>
             <h3 class="TaskList-SectionTitle">Курсы</h3>
-            <div class="TaskList-Progress">
+            {% comment %} <div class="TaskList-Progress">
                 <p><strong>Прогресс:</strong> 0 из n курсов</p>
-            </div>
+            </div> {% endcomment %}
             <ul class="TaskList-Items">
                 {% for course in courses %}
                     <li class="TaskItem">
-                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "course:subject" %}">{{ course.name }}</a></span></nav>
-                        <span class="TaskItem-Status">{{ course.status }}</span>
-                        <span class="TaskItem-Attempts">☑ ø1</span>
+                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "subject:subject" course.slug%}">{{ course.name }}</a></span></nav>
+                        {% comment %} <span class="TaskItem-Status">{{ course.status }}</span> {% endcomment %}
+                        {% comment %} <span class="TaskItem-Attempts">☑ ø1</span> {% endcomment %}
                     </li>                
                 {% endfor %}
             </ul>
-            <p class="TaskList-Instruction">Выберите задачу для решения</p>
+            {% comment %} <p class="TaskList-Instruction">Выберите задачу для решения</p> {% endcomment %}
         </div>
     </main>
 {% endblock  %}

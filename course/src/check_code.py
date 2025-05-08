@@ -1,6 +1,7 @@
 import time
 import nbformat
 from nbformat.notebooknode import NotebookNode
+from jupyterhub.services.auth import HubAuth
 import re
 import requests
 from websocket import create_connection, WebSocketTimeoutException

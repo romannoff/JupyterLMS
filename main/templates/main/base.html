@@ -7,6 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{% static "styles.css" %}">
+    <link href="{% static "js/codemirror/lib/codemirror.css"%}" rel="stylesheet">
+    <script src="{% static "js/codemirror/lib/codemirror.js" %}"></script>
+    <script src="{% static "js/codemirror/mode/python/python.js" %}"></script>
+    <script src="{% static "js/codemirror/mode/markdown/markdown.js" %}"></script>
+    <link href="{% static "js/codemirror/theme/darcula.css"%}" rel="stylesheet">
+    <link href="{% static "js/codemirror/theme/dracula.css"%}" rel="stylesheet">
+    <script src="{% static "js/codemirror/addon/edit/matchbrackets.js" %}"></script>
+    <style>
+        .CodeMirror { height: auto; }
+        .CodeMirror-scroll { max-height: 200px; }
+        .CodeMirror pre { padding-left: 7px; line-height: 1.25; }
+    </style>
 </head>
 <body class="Theme Theme_color_hrDark">
     <header class="Header">
@@ -16,11 +28,31 @@
         <nav class="Header-Nav">
             <ul>
                 <li><a href="{% url "main:index" %}">Главная</a></li>
-                <li><a href="{% url "main:example" %}">О нас</a></li>
+                {% if user.is_admin or user.is_staff %}
+                    <li><a href="{% url "admin:index" %}">Админ панель</a></li>
+                {% endif %}
+                {% if user.is_admin or user.is_staff %}
+                    <form class="AuthForm" action="{% url "main:prep" %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <table>
+                            <tr>
+                                <th>
+                                <input type="file" name="notebook" required>
+                                </th>
+                                <th>
+                                <button type="submit">
+                                    Отправить
+                                </button>
+                                </th>
+                            </tr>
+                        </table>
+                    </form>
+                {% endif %}
+                <li><a href="{% url "user:logout" %}">Выйти</a></li>
             </ul>
         </nav>
         <div class="Header-UserMenu">
-            <button class="UserMenu-Button">Профиль</button>
+            {% comment %} <button class="UserMenu-Button">Профиль</button> {% endcomment %}
         </div>
     </header>
     
@@ -28,5 +60,63 @@
     
     {% endblock %}
 
+    <script>
+        var code_elements = document.getElementsByName("edit_code");
+        for (let i = 0; i < code_elements.length; i++) {
+            var code_textarea = code_elements[i].getElementsByTagName("textarea")[0];
+            if (!code_textarea) continue; // Проверка наличия элемента
+            CodeMirror.fromTextArea(code_textarea, {
+                mode: {name: "python",
+                    version: 3,
+                    singleLineStringErrors: false},
+        
+                indentUnit: 4,
+                matchBrackets: true,
+                theme: "darcula"
+            });
+        };
+    
+        var text_elements = document.getElementsByName("edit_text");
+        for (let i = 0; i < text_elements.length; i++) {
+            var text_textarea = text_elements[i].getElementsByTagName("textarea")[0];
+            if (!text_textarea) continue; // Проверка наличия элемента
+            CodeMirror.fromTextArea(text_textarea, {
+                mode: {name: "markdown"},
+        
+                indentUnit: 4,
+                matchBrackets: true,
+                theme: "darcula"
+            });
+        };
+    
+        var no_text_elements = document.getElementsByName("no_edit_text");
+        for (let i = 0; i < no_text_elements.length; i++) {
+            var no_text_textarea = no_text_elements[i].getElementsByTagName("textarea")[0];
+            if (!no_text_textarea) continue; // Проверка наличия элемента
+            CodeMirror.fromTextArea(no_text_textarea, {
+                mode: {name: "markdown"},
+        
+                theme: "darcula",
+                readOnly: true,
+            });
+        };
+
+        var no_code_elements = document.getElementsByName("no_edit_code");
+        for (let i = 0; i < no_code_elements.length; i++) {
+            var no_code_textarea = no_code_elements[i].getElementsByTagName("textarea")[0];
+            if (!no_code_textarea) continue; // Проверка наличия элемента
+            CodeMirror.fromTextArea(no_code_textarea, {
+                mode: {name: "python",
+                    version: 3,
+                    singleLineStringErrors: false},
+        
+                indentUnit: 4,
+                matchBrackets: true,
+                readOnly: true,
+                theme: "darcula"
+            });
+        };
+    
+    </script>
 </body>
 </html>

@@ -1,0 +1,127 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="MainContent">
+        <form class="AuthForm" action="{% url "main:save" %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="notebook" value="{{ notebook }}">
+            <input type="hidden" name="len_task" value="{% if len_task %}{{ len_task }}{% endif %}">
+            <table>
+                <tr>
+                    <td>
+                        <div class="Field" name="no_edit_text">
+                            <textarea>Название курса</textarea>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="Field" name="edit_text">
+                            <textarea name="course_name">{% if form.name.value %}{{ form.name.value }}{% endif %}</textarea>
+                        </div>
+                    </td>
+                </tr>
+                {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Название задания</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_text">
+                                <textarea name="task_name-{{ task.no.value }}">{% if task.name.value %}{{ task.name.value }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Описание задания</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_text">
+                                <textarea name="task_description-{{ task.no.value }}">{% if task.description %}{{ task.description }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Код, выше кода ученика</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_code">
+                                <textarea name="task_up_code-{{ task.no.value }}">{% if task.up_code %}{{ task.up_code }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Код, ниже кода ученика</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_code">
+                                <textarea name="task_down_code-{{ task.no.value }}">{% if task.down_code %}{{ task.down_code }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Открытые тесты</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_code">
+                                <textarea name="task_open_assert-{{ task.no.value }}">{% if task.open_assert %}{{ task.open_assert }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Закрытые тесты</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_code">
+                                <textarea name="task_close_assert-{{ task.no.value }}">{% if task.close_assert %}{{ task.close_assert }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Ограничение по времени</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_text">
+                                <textarea name="task_time-{{ task.no.value }}">{% if task.time.value %}{{ task.time.value }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="Field" name="no_edit_text">
+                                <textarea>Ограничение по памяти в kiB</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="Field" name="edit_text">
+                                <textarea name="task_memory-{{ task.no.value }}">{% if task.memory.value %}{{ task.memory.value }}{% endif %}</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <button class="Button2 Button2_view_primary Button2_size_m" type="submit">
+                Подтвердить
+            </button>
+        </form>
+    </main>
+{% endblock  %}

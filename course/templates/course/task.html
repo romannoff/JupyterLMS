@@ -1,34 +1,42 @@
 {% extends "main/base.html" %}
 {% load static %}
-
 {% block content %}
 <main class="MainContent">
     <div class="SplitContainer">
         <div class="TaskDescription">
-            <h1 class="TaskTitle">{{ title }}</h1>
+            <h1 class="TaskTitle">{{ title.name }}</h1>
             <div class="TaskInfo">
-                <p><strong>Описание:</strong> {{ description }}</p>
-                <p><strong>Отправленные решения:</strong> У вас ещё нет отправленных решений.</p>
+                <p><strong>Описание:</strong></p> 
+                <p><div name="no_edit_text"><textarea>{{ title.description }}</textarea></div></p>
+                {% if title.open_assert %}
+                <p><strong>Тесты:</strong></p> 
+                <p><div name="no_edit_code"><textarea>{{ title.open_assert }}</textarea></div></p>
+                {% endif %}
+                {% if best_solution %}
+                <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
+                <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div>
+                <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
+                <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div>
+                {% else %}
+                <p><strong>Еще не загружено ни одного решения</strong></p>
+                {% endif %}
+
             </div>
         </div>
         <div class="CodeInput">
-            <form class="CodeInput" action="{% url "course:task" %}" method="POST">
+            <form class="CodeInput" method="POST">
                 {% csrf_token %}
-                {% if is_code %}
-                    Time: {{time}}               Memory: {{memory}}
+                {% if code %}
+                Time: {{code.time}} с.              Memory: {{code.memory}} kiB
                 {% else %}
-                     Еще не загружено ни одного решения
+                
                 {% endif %}
-                <textarea class="CodeEditor" placeholder="Введите ваш код здесь..." name="code">{% if is_code %} {{ code }} {% endif %}</textarea>
+                <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div>
+                <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% else %}    {% endif %}</textarea></div>
+                <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div>
                 <button class="SubmitButton">Отправить</button>
             </form>
         </div>
     </div>
 </main>
-
-<form method="POST">
-    {% csrf_token %}
-    {{comment_form.as_p}}
-</form>
-
 {% endblock  %}
