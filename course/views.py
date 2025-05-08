@@ -11,7 +11,7 @@ from users.models import Solution
 from src.check_code import NotebookChecker
 from src.logging_config import logger
 
-# nb_checker = NotebookChecker()
+nb_checker = NotebookChecker()
 
 
 @login_required
@@ -38,20 +38,19 @@ def task(request, task_slug):
     solution = Solution.objects.filter(task=task, user=request.user).order_by('-timestamp').first()
 
     if request.method == 'POST':
-        code = request.POST['code']
+        code = request.POST['code'] # код только пользователя (без начала и конца)
         print(code)
 
 
         if not (solution and code == solution.user_code) and code:
 
             notebook = task.course.notebook # расположение ноутбука с тестами
+            user_id = request.user.id # id пользователя
+            time = task.time # ограничение по времени
+            memory = task.memory # ограничение по памяти
+            task_name = task.name # название задания
             logger.info(code)
-            # result = nb_checker.check_code(code)
-            result = {
-                'text': 'text', 
-                'time': '12',
-                'memory': '100',
-            }
+            result = nb_checker.check_code(code)
             logger.info(result)
 
             if result['time'] is None or result['memory'] is None:
