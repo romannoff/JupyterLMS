@@ -14,9 +14,9 @@
                 {% endif %}
                 {% if best_solution %}
                 <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
-                <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div>
+                <!-- <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div> -->
                 <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
-                <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div>
+                <!-- <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div> -->
                 {% else %}
                 <p><strong>Еще не загружено ни одного решения</strong></p>
                 {% endif %}
@@ -31,9 +31,9 @@
                 {% else %}
                 
                 {% endif %}
-                <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div>
-                <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% else %}    {% endif %}</textarea></div>
-                <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div>
+                <!-- <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div> -->
+                <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% else %}{{title.up_code}}{% endif %}</textarea></div>
+                <!-- <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div> -->
                 <button class="SubmitButton">Отправить</button>
             </form>
         </div>
