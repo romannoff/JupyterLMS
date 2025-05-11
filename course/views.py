@@ -44,7 +44,7 @@ def task(request, task_slug):
 
         if not (solution and code == solution.user_code) and code:
 
-            notebook = task.course.notebook # расположение ноутбука с тестами
+            notebook = 'course_files/' + task.course.notebook.name # расположение ноутбука с тестами
             user_id = request.user.id # id пользователя
             time = task.time # ограничение по времени
             memory = task.memory # ограничение по памяти
