@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    volumes:
+      - ./lms:/app
+    ports:
+      - "8008:8008"
+    depends_on:
+      - redis
+      - jupyterhub
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+    # используем entrypoint.sh, в котором применяются миграции и стартует Django
+    entrypoint: ["/app/entrypoint.sh"]
+
+  worker:
+    build: .
+    volumes:
+      - ./lms:/app
+    depends_on:
+      - redis
+      - web
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    # отключаем стандартный entrypoint и запускаем только Celery
+    entrypoint: ["celery", "-A", "app", "worker", "--loglevel=info"]
+
+  redis:
+    image: redis:alpine
+
+  jupyterhub:
+    build: ./jhub_docker
+    volumes:
+      - ./jhub_docker/jhub_data:/srv/jupyterhub
+    ports:
+      - "8000:8000"
+    environment:
+      JUPYTERHUB_API_TOKEN: 07551b6a34fa4bbbac6fe6d3645fc6d8
