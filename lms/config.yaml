@@ -1,0 +1,10 @@
+delimiter: '#%423#'
+template_file: 'template.ipynb'
+kernel_name: 'python3'
+kernel_url: 'http://jupyterhub:8888'
+file_name: 'course/src/LMS.ipynb'
+units:
+  - 'KiB'
+  - 'MiB'
+  - 'GiB'
+  - 'TiB'

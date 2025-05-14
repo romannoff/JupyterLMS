@@ -105,4 +105,4 @@ def jupyter_parser(notebook_path):
 
 
 if __name__ == '__main__':
-    print(jupyter_parser('LMS2.ipynb'))
+    print(jupyter_parser('LMS.ipynb'))

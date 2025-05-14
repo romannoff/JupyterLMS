@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from pytils.translit import slugify
 
 from course.models import Courses, Tasks
-from src.jupyter_parser import jupyter_parser
+from course.src.jupyter_parser import jupyter_parser
 from main.forms import TaskCreationForm, CourseCreationForm
 
 @login_required
