@@ -3,14 +3,7 @@
 Наша LMS-система предназначена для упрощения процесса обучения программированию и автоматической проверки заданий учеников. Она сочетает в себе высокую гибкость и мощные инструменты для проверки кода, делая обучение более эффективным и интерактивным.
 
 # Запуск:
-- python -m venv venv
-- .\venv\Scripts\activate
-- pip install -r .\requirements.txt
-- pip install -e .\course\.
-- manage.py makemigrations
-- mange.py migrate
-- manage.py createsuperuser
-- python .\manage.py runserver 9000 (тут можно указать любой порт)
+docker-compose up --build
 
 # Ключевые особенности:
 
