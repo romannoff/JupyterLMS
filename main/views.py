@@ -82,7 +82,7 @@ def save(request):
         )
 
     for i in range(int(request.POST['len_task'])):
-        task = Courses.objects.filter(slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']))
+        task = Tasks.objects.filter(slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']))
         if task:
             task.update(
                 up_code=request.POST[f'task_up_code-{i}'],

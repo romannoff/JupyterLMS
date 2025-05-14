@@ -4,6 +4,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 import datetime
 import numpy as np
+from markdown import markdown
+from django.utils.safestring import mark_safe
 
 from course.models import Tasks, Courses
 from users.models import Solution
@@ -34,6 +36,7 @@ def task(request, task_slug):
     task = Tasks.objects.get(slug=task_slug)
     context = {
         'title': task,
+        'description': mark_safe(markdown(task.description)),
     }
     solution = Solution.objects.filter(task=task, user=request.user).order_by('-timestamp').first()
 
@@ -44,7 +47,7 @@ def task(request, task_slug):
 
         if not (solution and code == solution.user_code) and code:
 
-            notebook = task.course.notebook # расположение ноутбука с тестами
+            notebook = 'course_files/' + task.course.notebook.name # расположение ноутбука с тестами
             logger.info(code)
             # result = nb_checker.check_code(code)
             result = {
