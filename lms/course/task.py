@@ -19,10 +19,11 @@ def check_student_code(student_code, notebook_filename, task_id, time_limit, mem
 
     # Создание решения
     solution = Solution.objects.create(
-        user_id=user_id,
-        task_id=task_id_,
+        user=user_id,
+        task=task_id_,
         user_code=student_code,
         timestamp=timezone.now(),
+        text='error', # можно хранить ошибки, чтобы они отображались при входе 
         time=10,
         memory=10,
         score=0,

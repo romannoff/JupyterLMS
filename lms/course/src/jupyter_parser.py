@@ -69,7 +69,9 @@ def jupyter_parser(notebook_path):
             if current_task is not None:
                 result['tasks'].append(current_task)
 
-            task_name, task_description = cell['source'].split('\n')
+            arr = cell['source'].split('\n') # немного подкорректировал на случай многострочного описания
+            task_name = arr[0]
+            task_description = '\n'.join(arr[1:])
 
             task_name = re.sub('#', '', task_name).strip()
 

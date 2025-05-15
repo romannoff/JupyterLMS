@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from pytils.translit import slugify
+from markdown_deux  import markdown
 
 from course.models import Courses, Tasks
 from course.src.jupyter_parser import jupyter_parser
@@ -42,6 +43,7 @@ def prep(request):
     for task in parse_res['tasks']:
         task_form = TaskCreationForm(
             data={
+                'id': task['task_id'],
                 'name': task['task_name'],
                 'time': task['time_limit'],
                 'memory': task['memory_limit'],
@@ -82,26 +84,28 @@ def save(request):
         )
 
     for i in range(int(request.POST['len_task'])):
-        task = Courses.objects.filter(slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']))
+        task = Tasks.objects.filter(slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']))
         if task:
             task.update(
+                numb_of_task=request.POST[f'task_id-{i}'],
                 up_code=request.POST[f'task_up_code-{i}'],
                 down_code=request.POST[f'task_down_code-{i}'],
                 open_assert=request.POST[f'task_open_assert-{i}'],
                 close_assert=request.POST[f'task_close_assert-{i}'],
-                description=request.POST[f'task_description-{i}'],
+                description=markdown(request.POST[f'task_description-{i}']),
                 time=float(request.POST[f'task_time-{i}'].replace(',', '.')),
                 memory=float(request.POST[f'task_memory-{i}'].replace(',', '.')),
                 )
         else:
             Tasks.objects.create(
+                numb_of_task=request.POST[f'task_id-{i}'],
                 name=request.POST[f'task_name-{i}'],
                 up_code=request.POST[f'task_up_code-{i}'],
                 down_code=request.POST[f'task_down_code-{i}'],
                 open_assert=request.POST[f'task_open_assert-{i}'],
                 close_assert=request.POST[f'task_close_assert-{i}'],
                 slug=slugify(request.POST['course_name'])+'---'+slugify(request.POST[f'task_name-{i}']),
-                description=request.POST[f'task_description-{i}'],
+                description=markdown(request.POST[f'task_description-{i}']),
                 time=float(request.POST[f'task_time-{i}'].replace(',', '.')),
                 memory=float(request.POST[f'task_memory-{i}'].replace(',', '.')),
                 course=course,

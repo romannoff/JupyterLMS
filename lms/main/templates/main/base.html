@@ -81,14 +81,12 @@
             var text_textarea = text_elements[i].getElementsByTagName("textarea")[0];
             if (!text_textarea) continue; // Проверка наличия элемента
             CodeMirror.fromTextArea(text_textarea, {
-                mode: {name: "markdown"},
-        
+                mode: 'markdown',
                 indentUnit: 4,
-                matchBrackets: true,
                 theme: "darcula"
             });
         };
-    
+
         var no_text_elements = document.getElementsByName("no_edit_text");
         for (let i = 0; i < no_text_elements.length; i++) {
             var no_text_textarea = no_text_elements[i].getElementsByTagName("textarea")[0];
