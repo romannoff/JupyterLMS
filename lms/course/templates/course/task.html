@@ -7,8 +7,22 @@
             <h1 class="TaskTitle">{{ title.name }}</h1>
             <div class="TaskInfo">
                 <p><strong>Описание:</strong></p> 
-                <p>{{ description }}</p>
-                <p>Отображать лучшее решение / ошибки <div class="switch-btn" data-show="#bl-1" data-hide="#bl-2" style="margin: 10px;"></div></p>
+                {{ description }}
+                {% if best_solution %}
+                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
+                  <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
+                {% else %}
+                {% endif %}
+                {% if text %}
+                  <p><strong>Статус последнего решении:</strong></p>
+                  <div name="no_edit_text"><textarea>{{text}}</textarea></div>
+                {% elif code.text %}
+                  <p><strong>Ошибки в последнем решении:</strong></p>
+                  <div name="no_edit_text"><textarea>{{code.text}}</textarea></div>
+                {% else %}
+                  <p><strong>Еще не загружено ни одного решения</strong></p>
+                {% endif %}
+                {% comment %} <p>Отображать лучшее решение / ошибки <div class="switch-btn" data-show="#bl-1" data-hide="#bl-2" style="margin: 10px;"></div></p>
                 <div id="bl-2">
                   {% if best_solution %}
                   <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
@@ -26,7 +40,7 @@
                   {% else %}
                   <p><strong>Еще не загружено ни одного решения</strong></p>
                   {% endif %}
-                </div>
+                </div> {% endcomment %}
 
             </div>
         </div>
@@ -43,15 +57,16 @@
                 <!-- <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div> -->
                 <button class="SubmitButton">Отправить</button>
                 {% if title.open_assert %}
+                <p></p>
                 <p><strong>Тесты:</strong></p> 
-                <p><div name="no_edit_code"><textarea>{{ title.open_assert }}</textarea></div></p>
+                <div name="no_edit_code"><textarea>{{ title.open_assert }}</textarea></div>
                 {% endif %}
             </form>
         </div>
     </div>
 </main>
 
-<script src="{% static "js/jquery/jquery-3.7.0.min.js" %}"></script>
+{% comment %} <script src="{% static "js/jquery/jquery-3.7.0.min.js" %}"></script> {% endcomment %}
 
 <script>
   $(function () {

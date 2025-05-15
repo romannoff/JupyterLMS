@@ -15,6 +15,7 @@ class TaskCreationForm(forms.Form):
     class Meta:
         model = Tasks
     
+    id = forms.CharField()
     name = forms.CharField()
     up_code = forms.Textarea()
     down_code = forms.Textarea()

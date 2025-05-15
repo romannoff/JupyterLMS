@@ -21,6 +21,7 @@
                     </td>
                 </tr>
                 {% for task in tasks %}
+                    <input type="hidden" name="task_id-{{ task.no.value }}" value="{% if task.id.value %}{{ task.id.value }}{% endif %}">
                     <tr>
                         <td>
                             <div class="Field" name="no_edit_text">

@@ -18,6 +18,7 @@ class User(AbstractUser):
 
 class Solution(models.Model):
     user_code = models.TextField(verbose_name='Код пользователя')
+    text = models.TextField(blank=True, null=True, verbose_name='Ошибки в коде')
     timestamp = models.DateTimeField(verbose_name='Время загрузки')
     task = models.ForeignKey(to=Tasks, on_delete=models.CASCADE, verbose_name='Задание')
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, verbose_name='Пользователь')

@@ -16,6 +16,7 @@ class Courses(models.Model):
 
 
 class Tasks(models.Model):
+    numb_of_task = models.CharField(max_length=150, verbose_name='ID задания')
     name = models.CharField(max_length=150, verbose_name='Название задания')
     up_code = models.TextField(blank=True, null=True, verbose_name='Код, выше кода пользователя')
     down_code = models.TextField(blank=True, null=True, verbose_name='Код, ниже кода пользователя')
