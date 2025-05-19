@@ -9,7 +9,7 @@
                 <p><strong>Описание:</strong></p> 
                 {{ description }}
                 {% if best_solution %}
-                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
+                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} kiB </p>
                   <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
                 {% else %}
                 {% endif %}
@@ -22,38 +22,18 @@
                 {% else %}
                   <p><strong>Еще не загружено ни одного решения</strong></p>
                 {% endif %}
-                {% comment %} <p>Отображать лучшее решение / ошибки <div class="switch-btn" data-show="#bl-1" data-hide="#bl-2" style="margin: 10px;"></div></p>
-                <div id="bl-2">
-                  {% if best_solution %}
-                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} {{title.memory_unit}} </p>
-                  <!-- <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div> -->
-                  <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
-                  <!-- <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div> -->
-                  {% else %}
-                  <p><strong>Еще не загружено ни одного решения</strong></p>
-                  {% endif %}
-                </div>
-                <div id="bl-1" class="bl-hide">
-                  {% if text %}
-                  <p><strong>Ошибки в последнем решении:</strong></p>
-                  <div name="no_edit_text"><textarea>{{text}}</textarea></div>
-                  {% else %}
-                  <p><strong>Еще не загружено ни одного решения</strong></p>
-                  {% endif %}
-                </div> {% endcomment %}
-
             </div>
         </div>
         <div class="CodeInput">
             <form class="CodeInput" method="POST">
                 {% csrf_token %}
                 {% if code %}
-                Time: {{code.time}} с.              Memory: {{code.memory}} kiB              Показать ошибки: 
+                Time: {{code.time}} с.              Memory: {{code.memory}} kiB
                 {% else %}
-                
+                Time: -- с.              Memory: -- kiB
                 {% endif %}
                 <!-- <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div> -->
-                <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% else %}{{title.up_code}}{% endif %}</textarea></div>
+                <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% elif user_code %}{{user_code}}{% else %}{{title.up_code}}{% endif %}</textarea></div>
                 <!-- <div name="no_edit_code"><textarea>{{title.down_code}}</textarea></div> -->
                 <button class="SubmitButton">Отправить</button>
                 {% if title.open_assert %}
@@ -65,8 +45,6 @@
         </div>
     </div>
 </main>
-
-{% comment %} <script src="{% static "js/jquery/jquery-3.7.0.min.js" %}"></script> {% endcomment %}
 
 <script>
   $(function () {
@@ -89,6 +67,22 @@
       }
     });
   });
+</script>
+
+<script>
+  const solutionId = "{{ solution_id }}";
+  let checkInterval = setInterval(checkStatus, 2000);
+
+  function checkStatus() {
+      fetch(`check-status/${solutionId}/`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success' || data.status === 'error') {
+                  clearInterval(checkInterval);
+                  window.location.href = ``;
+              }
+          });
+  }
 </script>
     
 {% endblock  %}

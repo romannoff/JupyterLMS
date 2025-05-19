@@ -17,6 +17,7 @@ class User(AbstractUser):
 
 
 class Solution(models.Model):
+    numb_of_solution = models.CharField(max_length=150, verbose_name='ID решения пользователя')
     user_code = models.TextField(verbose_name='Код пользователя')
     text = models.TextField(blank=True, null=True, verbose_name='Ошибки в коде')
     timestamp = models.DateTimeField(verbose_name='Время загрузки')
@@ -25,6 +26,7 @@ class Solution(models.Model):
     time = models.DecimalField(default=0.00, decimal_places=2, max_digits=7, verbose_name='Время')
     memory = models.PositiveIntegerField(default=0, verbose_name='Память')
     score = models.DecimalField(default=0.00, decimal_places=2, max_digits=7, verbose_name='Результат')
+    status = models.CharField(max_length=150, verbose_name='Статус решения пользователя')
 
     class Meta:
         db_table = 'solution'
