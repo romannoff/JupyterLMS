@@ -9,7 +9,7 @@
                 <p><strong>Описание:</strong></p> 
                 {{ description }}
                 {% if best_solution %}
-                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} kiB </p>
+                  <p><strong>Лучшее решение:</strong> Time: {{best_solution.time}} с.              Memory: {{best_solution.memory}} miB </p>
                   <div name="no_edit_code"><textarea>{{best_solution}}</textarea></div>
                 {% else %}
                 {% endif %}
@@ -28,9 +28,9 @@
             <form class="CodeInput" method="POST">
                 {% csrf_token %}
                 {% if code %}
-                Time: {{code.time}} с.              Memory: {{code.memory}} kiB
+                Time: {{code.time}} с.              Memory: {{code.memory}} miB
                 {% else %}
-                Time: -- с.              Memory: -- kiB
+                Time: -- с.              Memory: -- miB
                 {% endif %}
                 <!-- <div name="no_edit_code"><textarea>{{title.up_code}}</textarea></div> -->
                 <div name="edit_code"><textarea name="code">{% if code %}{{code}}{% elif user_code %}{{user_code}}{% else %}{{title.up_code}}{% endif %}</textarea></div>
