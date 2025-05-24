@@ -38,9 +38,8 @@ def task(request, task_slug):
     }
     solution = Solution.objects.filter(task=task.id, user=request.user.id).order_by('-timestamp').first()
 
-    context['text'] = solution.text
-
     if solution:
+        context['text'] = solution.text
         context['code'] = solution
 
     if request.method == 'POST':
