@@ -60,8 +60,8 @@ def task(request, task_slug):
             logger.info([code, notebook, task_id, time, memory, user_id, task_name])
 
             # Вместо выполнения непосредственно в запросе, отправляем задачу в Celery
-            result = check_student_code.apply_async(
-                args=[code, notebook, task_id, time, memory, user_id, task_name, solution_id]
+            check_student_code.apply_async(
+                args=[code, notebook, task_id, time, memory, user_id, solution_id]
             )
 
             # Возвращаем сообщение об успехе, можно будет добавить async обработку результата
