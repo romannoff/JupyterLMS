@@ -11,3 +11,9 @@ course/files/student_code.py
 #django stuff
 db.sqlite3
 media/
+lms/course/migrations/
+lms/users/migrations/
+
+#jupyter stuff
+jhub_docker/jhub_data/*
+!jhub_docker/jhub_data/jupyterhub_config.py
