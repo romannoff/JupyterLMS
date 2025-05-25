@@ -18,6 +18,11 @@ def check_student_code(student_code, notebook_filename, task_id, time_limit, mem
 
     # записываем в бд и решения. закончившиеся ошибкой, иначе скрипт бесконечно ждет ответа для автообновления страницы
     # Создание решения
+
+    time_ = result['time'] if result['time'] is not None else time_limit + 1
+    memory = result['memory'] if result['memory'] is not None else memory_limit + 1
+    score = np.sqrt(time_**2 + memory**2)
+
     Solution.objects.create(
         numb_of_solution=solution_id,
         user_id=user_id,
@@ -25,13 +30,10 @@ def check_student_code(student_code, notebook_filename, task_id, time_limit, mem
         user_code=student_code,
         timestamp=timezone.now(),
         text=result['text'],    # можно хранить ошибки, чтобы они отображались при входе
-        time=result['time'],
-        memory=result['memory'],
-        score=np.sqrt(result['time'] ** 2 + result['memory'] ** 2) if result['time'] is not None else 0,
-        status='success' if result['time'] is not None else 'error' # статус решения, нужен для автообновления странички. может принимать 2 значения: 'success' или 'error'
-        # time=float(result['time'].split('#')[0]),
-        # memory=float(result['memory'].split('#')[0]),
-        # score=np.sqrt(float(result['time'].split('#')[0]) ** 2 + float(result['memory'].split('#')[0]) ** 2)
+        time=time_,
+        memory=memory,
+        score=score,
+        status='success' if result['time'] is not None else 'error'
     )
 
     # Обработка результата
