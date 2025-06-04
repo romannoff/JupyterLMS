@@ -346,6 +346,9 @@ class NotebookChecker:
         # Импортируем модули для трекинга памяти
         self.send_code_and_wait(notebook['cells'][0]['source'])
 
+        if notebook['cells'][1]['cell_type'] == 'code':
+            self.send_code_and_wait(notebook['cells'][1]['source'])
+
         # Выполнение ноутбука
         try:
             # Выполняем код ученика
@@ -401,7 +404,7 @@ if __name__ == '__main__':
                 time.sleep(10)
                 return a + b
             """,
-            'LMS.ipynb',
+            'pandas.ipynb',
             task_id='095f1c66-fec2-4f9e-a487-5a1e75e4b505',
             time_limit=2,
             memory_limit=1
