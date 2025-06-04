@@ -3,7 +3,7 @@ FROM jupyterhub/jupyterhub:latest
 RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
-    && pip install --no-cache-dir jupyterlab jupyter_server memory_profiler
+    && pip install --no-cache-dir jupyterlab jupyter_server memory_profiler pandas numpy
 
 # Создаём пользователя user1 с паролем
 RUN useradd -m user1 && echo "user1:password" | chpasswd && adduser user1 sudo
