@@ -35,10 +35,18 @@ def get_no_hidden_text(cell):
 
 
 def get_restrictions(text) -> (float, float):
-    timeout = re.search(r'timeout\s*=\s*([0-9\.]*)', text)[1]
-    memory_max = re.search(r'memory_max\s*=\s*([0-9\.]*)', text)[1]
+    timeout = re.search(r'timeout\s*=\s*([0-9\.]*)', text)
+    if timeout is None:
+        timeout = float('inf')
+    else:
+        timeout = (timeout[1])
+    memory_max = re.search(r'memory_max\s*=\s*([0-9\.]*)', text)
+    if memory_max is None:
+        memory_max = float('inf')
+    else:
+        memory_max = float(memory_max[1])
 
-    return float(timeout), float(memory_max)
+    return timeout, memory_max
 
 
 def jupyter_parser(notebook_path):
@@ -46,10 +54,12 @@ def jupyter_parser(notebook_path):
     with open(notebook_path, 'r', encoding='utf-8') as f:
         nb = nbformat.read(f, as_version=4)
 
-    if nb['cells'][0]['cell_type'] != 'markdown':
-        RuntimeError(f'Первая ячейка {notebook_path} не markdown')
+    cell_id = 0
 
-    course_name = re.sub('#', '', nb['cells'][0]['source']).strip()
+    while nb['cells'][cell_id]['cell_type'] == 'code':
+        cell_id += 1
+
+    course_name = re.sub('#', '', nb['cells'][cell_id]['source']).strip()
 
     result = Course(
         course_name=course_name,
@@ -60,7 +70,7 @@ def jupyter_parser(notebook_path):
     current_task = None
     counter = 3
 
-    for cell in nb['cells'][1:]:
+    for cell in nb['cells'][cell_id+1:]:
         if cell['cell_type'] == 'markdown':
             if counter < 2 and current_task is not None:
                 RuntimeError(f'В задаче {current_task["task_name"]} обнаружено ячеек типа code: {counter}. '
@@ -107,4 +117,4 @@ def jupyter_parser(notebook_path):
 
 
 if __name__ == '__main__':
-    print(jupyter_parser('LMS.ipynb'))
+    print(jupyter_parser('D:\python_project\LMS\mias_third_team_43\lms\course_files\pandas.ipynb'))
