@@ -2,8 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
-import datetime
-import numpy as np
+import uuid
 from django.utils.safestring import mark_safe
 
 from course.models import Tasks, Courses
@@ -55,7 +54,7 @@ def task(request, task_slug):
             memory = task.memory
             task_name = task.name
             task_id = task.numb_of_task
-            solution_id = 'some-ID-for-user-solution' + str(np.random.rand())
+            solution_id = uuid.uuid4()
             logger.info([code, notebook, task_id, time, memory, user_id, task_name])
 
             # Вместо выполнения непосредственно в запросе, отправляем задачу в Celery
@@ -67,7 +66,7 @@ def task(request, task_slug):
             context['text'] = "Код отправлен на обработку"
             context['solution_id'] = solution_id
 
-    best_solution = Solution.objects.filter(task=task.id, user=request.user.id).order_by('score').first()
+    best_solution = Solution.objects.filter(task=task.id, user=request.user.id, status='success').order_by('score').first()
     context['best_solution'] = best_solution
     return render(request, 'course/task.html', context)
 

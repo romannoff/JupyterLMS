@@ -19,8 +19,8 @@ def check_student_code(student_code, notebook_filename, task_id, time_limit, mem
     # записываем в бд и решения. закончившиеся ошибкой, иначе скрипт бесконечно ждет ответа для автообновления страницы
     # Создание решения
 
-    time_ = result['time'] if result['time'] is not None else time_limit + 1
-    memory = result['memory'] if result['memory'] is not None else memory_limit + 1
+    time_ = result['time'] if result['time'] is not None else 0
+    memory = result['memory'] if result['memory'] is not None else 0
     score = np.sqrt(time_**2 + memory**2)
 
     Solution.objects.create(
