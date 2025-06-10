@@ -13,9 +13,11 @@
             <ul class="TaskList-Items">
                 {% for task in tasks %}
                     <li class="TaskItem">
-                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "subject:task" task.slug%}">{{ task.name }}</a></span></nav>
-                        {% comment %} <span class="TaskItem-Status">{{ task.status }}</span>
-                        <span class="TaskItem-Attempts">☑ ø1</span> {% endcomment %}
+                        <nav class="Header-Nav"><span class="TaskItem-Name"><a href="{% url "subject:task" task.0.slug%}">{{ task.0.name }}</a></span>
+                        {% if task.1 %}
+                            <span class="TaskItem-Attempts">☑</span>
+                        {% endif %}
+                        </nav>
                     </li>                
                 {% endfor %}
             </ul>

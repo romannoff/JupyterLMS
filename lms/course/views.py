@@ -18,11 +18,14 @@ def subject(request, subject_slug):
     course = Courses.objects.get(slug=subject_slug)
     course_name = course.name
     tasks = Tasks.objects.filter(course=course)
+    task_n_mask = []
+    for task in tasks:
+        task_n_mask.append([task, 1 - (Solution.objects.filter(task=task.id, user=request.user.id, status='success').first() is None)])     
     
 
     context = {
         'title': 'Список заданий курса',
-        'tasks': tasks,
+        'tasks': task_n_mask,
         'course_name': course_name,
     }
     return render(request, 'course/subject.html', context)
