@@ -147,6 +147,11 @@ class NotebookChecker:
         @return: NotebookNode       - Итоговый файл с кодом ученика и тестами
 
         """
+
+        logger.info(task_id)
+        logger.info(task_id.split('/')[-1])
+        logger.info(file_name)
+
         # Загружаем ноутбук с заданиями и тестами
         with open(file_name, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, as_version=4)
@@ -156,6 +161,8 @@ class NotebookChecker:
 
         # По task_id находим индекс ячейки, с которой начинается код ученика
         cell_idx = None
+
+        task_id = task_id.split('/')[-1]
 
         for cell_idx in range(len(nb['cells'])):
             if nb['cells'][cell_idx]['id'] == task_id:
