@@ -1,5 +1,4 @@
 import nbformat
-from nbformat.notebooknode import NotebookNode
 from typing import TypedDict, List
 import re
 
@@ -71,7 +70,7 @@ def jupyter_parser(notebook_path):
     counter = 3
 
     for cell in nb['cells'][cell_id+1:]:
-        if cell['cell_type'] == 'markdown':
+        if cell['cell_type'] == 'markdown' and '<task>' in cell['source']:
             if counter < 2 and current_task is not None:
                 RuntimeError(f'В задаче {current_task["task_name"]} обнаружено ячеек типа code: {counter}. '
                              f'Необходимо как минимум две - начальный код и тесты')
@@ -79,7 +78,8 @@ def jupyter_parser(notebook_path):
             if current_task is not None:
                 result['tasks'].append(current_task)
 
-            arr = cell['source'].split('\n')
+            arr = cell['source'].replace('<task>', '').split('\n')
+            arr = [line for line in arr if line != '']
             task_name = arr[0]
             task_description = '\n'.join(arr[1:])
 
@@ -99,14 +99,14 @@ def jupyter_parser(notebook_path):
 
         text = get_no_hidden_text(cell['source'])
 
-        if counter == 0:
-            current_task['backbone'] = text
-
-        elif counter == 1:
-            current_task['open_tests'] = text
-
-        elif counter == 2:
-            current_task['time_limit'], current_task['memory_limit'] = get_restrictions(text)
+        if '#solution' in cell['source']:
+            current_task['backbone'] = text.replace('#solution', '')
+        elif '#test' in cell['source']:
+            current_task['open_tests'] += text.replace('#test', '') + '\n'
+        elif '#limits' in cell['source']:
+            current_task['time_limit'], current_task['memory_limit'] = get_restrictions(text.replace('#limits', ''))
+        else:
+            continue
 
         counter += 1
 
@@ -117,4 +117,4 @@ def jupyter_parser(notebook_path):
 
 
 if __name__ == '__main__':
-    print(jupyter_parser('D:\python_project\LMS\mias_third_team_43\lms\course_files\pandas.ipynb'))
+    print(jupyter_parser('D:\python_project\LMS\mias_third_team_43\lms\course_files\LMS_Python.ipynb'))

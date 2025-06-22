@@ -32,6 +32,10 @@ def subject(request, subject_slug):
 
 @login_required
 def task(request, task_slug):
+
+    # Сюда кинь флаг
+    get_logs = False
+
     task = Tasks.objects.get(slug=task_slug)
     context = {
         'title': task,
@@ -58,11 +62,11 @@ def task(request, task_slug):
             task_name = task.name
             task_id = task.numb_of_task
             solution_id = uuid.uuid4()
-            logger.info([code, notebook, task_id, time, memory, user_id, task_name])
+            logger.info([code, notebook, task_id, time, memory, user_id, task_name, get_logs])
 
             # Вместо выполнения непосредственно в запросе, отправляем задачу в Celery
             check_student_code.apply_async(
-                args=[code, notebook, task_id, time, memory, user_id, solution_id]
+                args=[code, notebook, task_id, time, memory, user_id, solution_id, get_logs]
             )
 
             # Возвращаем сообщение об успехе, можно будет добавить async обработку результата

@@ -8,11 +8,11 @@ from course.src.logging_config import logger
 
 
 @shared_task
-def check_student_code(student_code, notebook_filename, task_id, time_limit, memory_limit, user_id, solution_id):
+def check_student_code(student_code, notebook_filename, task_id, time_limit, memory_limit, user_id, solution_id, get_logs):
     nb_checker = NotebookChecker()
 
     # Проведение тестирования
-    result = nb_checker.check_code(student_code, notebook_filename, task_id, time_limit, memory_limit)
+    result = nb_checker.check_code(student_code, notebook_filename, task_id, time_limit, memory_limit, get_logs)
 
     task = Tasks.objects.get(numb_of_task=task_id)
 

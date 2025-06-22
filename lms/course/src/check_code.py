@@ -107,7 +107,7 @@ class NotebookChecker:
             cookie=f"_xsrf={xsrf}"
         )
 
-    def check_code(self, student_code, filename, task_id, time_limit, memory_limit):
+    def check_code(self, student_code, filename, task_id, time_limit, memory_limit, get_logs):
         """
             Функция для проверки кода ученика
 
@@ -116,6 +116,7 @@ class NotebookChecker:
             @param task_id: str - id jupyter ячейки, с которой начинается задание (хранится в базе даннх)
             @param time_limit: float - Ограничение в секундах
             @param memory_limit: float - Ограничение в MB
+            @param get_logs: bool - Возвращать ли логи выполнения кода ученика
             @return: dict - Если тесты пройдены успешно, то будет возвращён словарь с полями
             'text', 'time', 'memory'. Если тесты не выполнены или вызвано исключение, то в поле
             'text' будет описана ошибка, а остальные поля будут иметь None
@@ -130,7 +131,7 @@ class NotebookChecker:
         new_notebook, cell_with_code_idx = self.insert_code(filename, student_code, task_id, save_templates=False)
 
         # Проверка кода ученика
-        result = self.check_notebook(new_notebook, cell_with_code_idx, time_limit, memory_limit)
+        result = self.check_notebook(new_notebook, cell_with_code_idx, time_limit, memory_limit, get_logs)
 
         # Уничтожение созданного ядра
         self.kill_kernel()
@@ -167,36 +168,45 @@ class NotebookChecker:
         for cell_idx in range(len(nb['cells'])):
             if nb['cells'][cell_idx]['id'] == task_id:
                 break
-        cell_idx += 1
+        task_id = cell_idx + 1
 
         if cell_idx >= len(nb['cells']):
             raise RuntimeError(f"Не удалось найти ячейки с заданием. Необходима ячейка с id: {task_id}")
 
+        # Поиск ячейки для вставки кода
+        for cell_idx in range(task_id, len(nb['cells'])):
+            if '#solution' in nb['cells'][cell_idx]['source']:
+                break
+
         # Вставляем код ученика в ячейку
         nb['cells'][cell_idx]['source'] = user_code
 
-        # добавление функционала в ячейку с тестами
-        self.notebook_preproc(nb, cell_idx)
+        # добавление функционала в ячейки с тестами
+        for cell_idx in range(cell_idx, len(nb['cells'])):
+            if '#test' in nb['cells'][cell_idx]['source']:
+                self.notebook_preproc(nb, cell_idx)
+            if '#limits' in nb['cells'][cell_idx]['source']:
+                break
 
         if save_templates:
             with open(settings.template_file, 'w', encoding='utf-8') as f:
                 nbformat.write(nb, f)
 
-        return nb, cell_idx
+        return nb, task_id
 
     @staticmethod
-    def notebook_preproc(notebook: NotebookNode, cell_with_code) -> None:
+    def notebook_preproc(notebook: NotebookNode, cell_with_test) -> None:
         """
         Предобработка тестов, прописанных в notebook
         Функция добавляет возможность расчёта максимальной нагрузки на память при тестировании
         путём добавления строк в начало и в конец ячейки с тестами. Также добавляется возможность замера времени
 
         @param notebook: Загруженный файл .ipynd
-        @param cell_with_code: int - индекс ячейки с кодом
+        @param cell_with_test: int - индекс ячейки с тестами
         """
 
         start_memory_time_check = '%%time\n%%memit\n'
-        notebook.cells[cell_with_code + 1].source = start_memory_time_check + notebook.cells[cell_with_code + 1].source
+        notebook.cells[cell_with_test].source = start_memory_time_check + notebook.cells[cell_with_test].source
 
     def restart_kernel(self):
         if self.kernel_id is not None:
@@ -204,7 +214,7 @@ class NotebookChecker:
             resp.raise_for_status()
             logger.info('Ядро перезагружено')  #
 
-    def send_code_and_wait(self, code: str, timeout: float = 10):
+    def send_code_and_wait(self, code: str, texts: list, timeout: float = 10):
         header = {
             "msg_id": uuid.uuid4().hex,
             "username": self.USERNAME,
@@ -249,11 +259,13 @@ class NotebookChecker:
 
             # ошибки
             elif m["msg_type"] == "error":
+                texts.append(result)
                 raise RuntimeError(f"{m['content']['ename']}: {m['content']['evalue']}")
 
             # Конец исполнения
             elif m["msg_type"] == "status" and m["content"].get("execution_state") == "idle":
-                return result
+                texts.append(result)
+                return
         # время выполнения превышено
         else:
             self.session.post(f"{self.JUPYTERHUB_URL}/user/user1/api/kernels/{self.kernel_id}/interrupt")
@@ -337,47 +349,69 @@ class NotebookChecker:
 
         return text, time_, memory
 
-    def check_notebook(self, notebook: NotebookNode, cell_with_code_idx, time_limit, memory_limit) -> dict:
+    def check_notebook(self, notebook: NotebookNode, cell_with_task_idx, time_limit, memory_limit, get_logs) -> dict:
         """
         Функция для выполнения ноутбука
 
         @param notebook: NotebookNode - Обработанный ноутбук, готовый для проверки
-        @param cell_with_code_idx: int - номер ячейки, с которой начинается код ученика
+        @param cell_with_task_idx: int - номер ячейки, с которой начинается задания
         @param time_limit: float - Ограничение в секундах
         @param memory_limit: float - Ограничение в байтах
+        @param get_logs: bool - Возвращать ли логи выполнения кода ученика
         @return: dict - Если тесты пройдены успешно, то будет возвращён словарь с полями
         'text', 'time', 'memory'. Если тесты не выполнены или вызвано исключение, то в поле
         'text' будет описана ошибка, а остальные поля будут иметь None
         """
+        text = []
+        time_, memory = 0, 0
+        result = ''
 
         # Импортируем модули для трекинга памяти
-        self.send_code_and_wait(notebook['cells'][0]['source'])
+        self.send_code_and_wait(notebook['cells'][0]['source'], text)
 
         if notebook['cells'][1]['cell_type'] == 'code':
-            self.send_code_and_wait(notebook['cells'][1]['source'])
+            self.send_code_and_wait(notebook['cells'][1]['source'], text)
 
         # Выполнение ноутбука
         try:
-            # Выполняем код ученика
-            code = notebook['cells'][cell_with_code_idx]['source']
-            self.send_code_and_wait(code)
+            for cell_id in range(cell_with_task_idx, len(notebook['cells'])):
+                code = notebook['cells'][cell_id]['source']
 
-            # Выполняем тесты
-            tests = notebook['cells'][cell_with_code_idx + 1]['source']
-            result = self.send_code_and_wait(tests, time_limit)
+                if '#limits' in code:
+                    break
+
+                self.send_code_and_wait(code, text)
+                logger.info(text)
+
+                if '#test' in code:
+                    test_text, current_time, current_memory = self.get_info(text[-1])
+                    text[-1] = test_text
+
+                    if current_time > time_limit:
+                        # Превышение времени
+                        result = f"TimeoutError:\nCurrent time: {current_time} sec\nLimit: {time_limit} sec"
+                        time_, memory = None, None
+                        break
+
+                    if current_memory > memory_limit:
+                        # Превышение памяти
+                        result = f"MemoryError:\nCurrent memory increment: {current_memory} MB\nLimit: {memory_limit} MB"
+                        time_, memory = None, None
+                        break
+
+                    time_ += current_time
+                    memory += current_memory
+
+            if result == '':
+                result = 'All tests passed!'
             logger.info(result)
 
-            text, time_, memory = self.get_info(result)
+            text = [t for t in text if t != '']
 
-            if time_ > time_limit:
-                # Превышение времени
-                text = f"TimeoutError:\nCurrent time: {time_} sec\nLimit: {time_limit} sec"
-                time_, memory = None, None
-
-            if memory > memory_limit:
-                # Превышение памяти
-                text = f"MemoryError:\nCurrent memory increment: {memory} MB\nLimit: {memory_limit} MB"
-                time_, memory = None, None
+            if get_logs:
+                text = result + '\nLogs:\n' + '\n'.join(text)
+            else:
+                text = result
 
             return {
                 'text': text,
@@ -388,14 +422,14 @@ class NotebookChecker:
         # В ячейке ошибка
         except RuntimeError as e:
             return {
-                'text': e.args[0],
+                'text': str(e.args[0]) + '\nLogs:\n' + '\n'.join(text) if get_logs else e.args[0],
                 'time': None,
                 'memory': None,
             }
 
         except Exception as e:
             return {
-                'text': e,
+                'text': str(e) + '\nLogs:\n' + '\n'.join(text) if get_logs else e,
                 'time': None,
                 'memory': None,
             }
@@ -408,11 +442,11 @@ if __name__ == '__main__':
             """
             import time
             def my_fun(a, b):
-                time.sleep(10)
+                print(a, b)
                 return a + b
             """,
-            'pandas.ipynb',
-            task_id='095f1c66-fec2-4f9e-a487-5a1e75e4b505',
+            'D:\\python_project\\LMS\\mias_third_team_43\\lms\\course_files\\LMS_Python.ipynb',
+            task_id='D:\\python_project\\LMS\\mias_third_team_43\\lms\\course_files\\LMS_Python.ipynb/095f1c66-fec2-4f9e-a487-5a1e75e4b505',
             time_limit=2,
             memory_limit=1
         )
