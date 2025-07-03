@@ -2,7 +2,7 @@
 
 Наша LMS-система предназначена для упрощения процесса обучения программированию и автоматической проверки заданий учеников. Она сочетает в себе высокую гибкость и мощные инструменты для проверки кода, делая обучение более эффективным и интерактивным.
 
-<img src="https://gitlab.com/papochka_egor/mias_third_team_43/-/raw/main/preview/preview.gif" alt="гифка">
+![](https://github.com/romannoff/LMS_system/blob/main/preview/preview.gif)
 
 # Запуск:
 1) docker-compose up --build
